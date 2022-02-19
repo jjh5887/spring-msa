@@ -20,13 +20,15 @@ spring:
             - Path=/first-service/**
           # yml 을 이용한 필터 적용 방식
           filters:
-            - AddRequestHeader=first-request, first-request-header2
-            - AddResponseHeader=first-response, first-response-header2
+#            - AddRequestHeader=first-request, first-request-header2
+#            - AddResponseHeader=first-response, first-response-header2
+            - CustomFilter
         - id: second-service
           uri: http://localhost:8082/
           # yml 을 이용한 필터 적용 방식
           predicates:
             - Path=/second-service/**
           filters:
-            - AddRequestHeader=second-request, second-request-header2
-            - AddResponseHeader=second-response, second-response-header2
+#            - AddRequestHeader=second-request, second-request-header2
+#            - AddResponseHeader=second-response, second-response-header2
+            - CustomFilter
