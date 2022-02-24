@@ -5,6 +5,11 @@ server:
 spring:
   application:
     name: config-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   profiles:
     active: native # 이 설정을 적용하면 git 설정은 무시됨
   cloud:
@@ -17,3 +22,9 @@ spring:
 #          username: [your username]
 #          password: [your password]
 #          uri: file:///Users/jung-gwonho/workspace/spring-msa/git-local-repo
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, busrefresh
