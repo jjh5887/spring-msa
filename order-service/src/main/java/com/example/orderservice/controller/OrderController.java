@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.bytebuddy.matcher.StringMatcher;
-
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.service.OrderService;
@@ -38,7 +36,8 @@ public class OrderController {
 	}
 
 	@PostMapping("/{userId}/orders")
-	public ResponseEntity<ResponseOrder> createOrder(@RequestBody RequestOrder order, @PathVariable("userId") String userId) {
+	public ResponseEntity<ResponseOrder> createOrder(@RequestBody RequestOrder order,
+		@PathVariable("userId") String userId) {
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
@@ -52,7 +51,7 @@ public class OrderController {
 	}
 
 	@GetMapping("/{userId}/orders")
-	public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId){
+	public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId) {
 		Iterable<OrderEntity> orderList = orderService.getOrdersByUserId(userId);
 
 		List<ResponseOrder> result = new ArrayList<>();

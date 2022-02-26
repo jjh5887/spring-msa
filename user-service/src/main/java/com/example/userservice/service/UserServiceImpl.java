@@ -6,11 +6,16 @@ import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserEntity;
@@ -18,12 +23,16 @@ import com.example.userservice.jpa.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
+	private final Environment env;
+	private final RestTemplate restTemplate;
 
 	@Override
 	public UserDto createUser(UserDto userDto) {
@@ -49,7 +58,17 @@ public class UserServiceImpl implements UserService {
 
 		UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
 
-		List<ResponseOrder> ordersList = new ArrayList<>();
+		// List<ResponseOrder> ordersList = new ArrayList<>();
+
+		/* Using as rest template */
+		String orderUrl = String.format(env.getProperty("order_service.url"), userId);
+		log.info(orderUrl);
+		ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+			new ParameterizedTypeReference<List<ResponseOrder>>() {
+			});
+
+		List<ResponseOrder> ordersList = orderListResponse.getBody();
+
 		userDto.setOrders(ordersList);
 
 		return userDto;
