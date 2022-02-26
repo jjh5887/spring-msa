@@ -1,6 +1,8 @@
-token:
-  expiration_time: 86400000
-  secret: my_token_native_user_service
-
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: '{cipher}AQCTgbPSoKr/c6VxgCtar33SFJD7nF0QOqki5zdCAR9jmQWugCyRlkyLC4nM6bIAXnVOJedSBVy7MmOVHDqD04twW77qKrmiXOLJcaENCVCXTfzMUOR+dcew7DjwDZZaEnVST0mXW61stFoPOJJ8CEbCicUpxUIGiSOjjBkJwmoG2oNcEV5w75DKEIaWdCCe7+mF6//KrLc2RUbTv9eKEn0vg8IM3zlBvheg+DO+6Jph7vYle8HAktj9ks4GfCyOadEqIsfh+eoaDquHmj12hRG0SItV2YDF8+/2ncZ82VSSjpOGvqtlsqcjd6SHvQizLprVmKOyyI4951mMsG3hZu4YXXj5//XVCIhJr8AKPiyzNk99F7y/MOYJQL66f3OfFjk='
 gateway:
   ip: 127.0.0.1
