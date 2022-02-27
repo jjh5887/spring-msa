@@ -11,6 +11,6 @@ import com.example.userservice.vo.ResponseOrder;
 @FeignClient(name = "order-service") // Eureka 에 등록된 이름
 public interface OrderServiceClient {
 
-	@GetMapping("/order-service/{userId}/orders_ng") // 실제 요청 url
+	@GetMapping("/order-service/{userId}/orders") // 실제 요청 url
 	List<ResponseOrder> getOrders(@PathVariable String userId);
 }
