@@ -1,7 +1,5 @@
 package com.example.catalogservice.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.example.catalogservice.jpa.CatalogEntity;
