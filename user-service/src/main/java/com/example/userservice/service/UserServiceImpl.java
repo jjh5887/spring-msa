@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService {
 	private final Environment env;
 	private final RestTemplate restTemplate;
 	private final OrderServiceClient orderServiceClient;
+	private final CircuitBreakerFactory circuitBreakerFactory;
 
 	@Override
 	public UserDto createUser(UserDto userDto) {
@@ -80,7 +83,14 @@ public class UserServiceImpl implements UserService {
 
 
 		/* ErrorDecoder*/
-		List<ResponseOrder> ordersList = orderServiceClient.getOrders(userId);
+		// List<ResponseOrder> ordersList = orderServiceClient.getOrders(userId);
+
+		/* CircuitBreaker */
+		log.info("Before call order microservice");
+		CircuitBreaker circuitbreaker = circuitBreakerFactory.create("circuitbreaker");
+		List<ResponseOrder> ordersList = circuitbreaker.run(() -> orderServiceClient.getOrders(userId), throwable -> new ArrayList<>());
+		log.info("After call order microservice");
+
 		userDto.setOrders(ordersList);
 
 		return userDto;

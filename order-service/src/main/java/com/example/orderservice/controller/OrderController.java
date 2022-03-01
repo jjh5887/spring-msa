@@ -2,7 +2,6 @@ package com.example.orderservice.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -25,10 +24,12 @@ import com.example.orderservice.vo.RequestOrder;
 import com.example.orderservice.vo.ResponseOrder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/order-service")
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
 	private final Environment env;
 	private final OrderService orderService;
@@ -43,35 +44,48 @@ public class OrderController {
 	@PostMapping("/{userId}/orders")
 	public ResponseEntity<ResponseOrder> createOrder(@RequestBody RequestOrder orderDetails,
 		@PathVariable("userId") String userId) {
+		log.info("Before add order data");
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
 		OrderDto orderDto = modelMapper.map(orderDetails, OrderDto.class);
 		orderDto.setUserId(userId);
 		/* jpa */
-		// OrderDto createdOrder = orderService.createOrder(orderDto);
-		// ResponseOrder responseOrder = modelMapper.map(createdOrder, ResponseOrder.class);
+		OrderDto createdOrder = orderService.createOrder(orderDto);
+		ResponseOrder responseOrder = modelMapper.map(createdOrder, ResponseOrder.class);
 
 		/* kafka */
-		orderDto.setOrderId(UUID.randomUUID().toString());
-		orderDto.setTotalPrice(orderDetails.getQty() * orderDetails.getUnitPrice());
+		// orderDto.setOrderId(UUID.randomUUID().toString());
+		// orderDto.setTotalPrice(orderDetails.getQty() * orderDetails.getUnitPrice());
 
 		/* send this order to the kafka */
-		kafkaProducer.send("example-catalog-topic", orderDto);
-		orderProducer.send("orders", orderDto);
+		// kafkaProducer.send("example-catalog-topic", orderDto);
+		// orderProducer.send("orders", orderDto);
 
-		ResponseOrder responseOrder = modelMapper.map(orderDto, ResponseOrder.class);
+		// ResponseOrder responseOrder = modelMapper.map(orderDto, ResponseOrder.class);
+
+		log.info("After added order data");
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseOrder);
 	}
 
 	@GetMapping("/{userId}/orders")
-	public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId) {
+	public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId) throws Exception {
+		log.info("Before retrieve order data");
 		Iterable<OrderEntity> orderList = orderService.getOrdersByUserId(userId);
 
 		List<ResponseOrder> result = new ArrayList<>();
 		orderList.forEach(v -> {
 			result.add(new ModelMapper().map(v, ResponseOrder.class));
 		});
+
+		try {
+			Thread.sleep(1000);
+			throw new Exception("장애 발생!");
+		} catch (InterruptedException ex) {
+			log.warn(ex.getMessage());
+		}
+
+		log.info("After retrieved order data");
 
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
